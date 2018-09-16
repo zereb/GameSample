@@ -7,23 +7,25 @@ import java.util.Random;
 public class Game extends Canvas implements Runnable{
 
     public static final int WIDTH = 640, HEIGHT = WIDTH / 12 * 9;
+    public static final int TOP_WALL = 0;
+    public static final int BOTTOM_WALL = 1;
+
     private Thread thread;
     private boolean running = false;
     private Handler handler;
-    public Random random;
+    private Spawn spawn;
+    private Player player;
+    private Random random;
 
 
 
     public Game(){
         random = new Random();
         handler = new Handler();
+        spawn = new Spawn(handler);
+
         this.addKeyListener(new KeyInput(handler));
         new Window(WIDTH, HEIGHT, "core.Game", this);
-        handler.addObject(new Player(10, 10, ID.player, handler));
-
-        for (int i = 0; i < 10; i++){
-            handler.addObject(new Wall(Game.WIDTH + i*100,  Game.HEIGHT - random.nextInt(200), ID.Enemy, handler));
-        }
 
 
 
@@ -70,8 +72,7 @@ public class Game extends Canvas implements Runnable{
 
            if(System.currentTimeMillis() - timer > 1000){
                timer += 1000;
-               System.out.print("Fps: " + frames);
-               System.out.print(" Tiks: " + tiks);
+               System.out.println("Fps: " + frames + " Tiks: " + tiks);
                frames = 0;
                tiks = 0;
            }
@@ -81,6 +82,7 @@ public class Game extends Canvas implements Runnable{
 
    private void tick(){
         handler.tick();
+        spawn.tick();
    }
 
    private void render(){
@@ -107,5 +109,10 @@ public class Game extends Canvas implements Runnable{
 
     public static void newGame(){
         new Game();
+    }
+
+    public static int clamp(int var, int min, int max){
+        var = var > max ? max : var < min ? min : var;
+        return var;
     }
 }

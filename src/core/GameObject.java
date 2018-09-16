@@ -14,6 +14,9 @@ public abstract class GameObject {
     }
 
     public abstract Rectangle getBounce();
+
+    public abstract Rectangle getBounce(int pos);
+
     public abstract void tick();
     public abstract void render(Graphics g);
 

@@ -8,7 +8,7 @@ public class Player extends GameObject{
     private Handler handler;
     public int THRUST = -4;
     public int SIZE = 24;
-    public int score = 0;
+    public boolean dead = false;
 
 
 
@@ -27,12 +27,15 @@ public class Player extends GameObject{
     }
 
     @Override
+    public Rectangle getBounce(int pos) {
+        return null;
+    }
+
+    @Override
     public void tick() {
         long delta = System.currentTimeMillis() - lastTime;
         if(delta> 100){
             velY = velY + 1;
-            score++;
-            System.out.println(" Score: " + score);
             cooldown -= delta;
             lastTime = System.currentTimeMillis();
         }
@@ -40,7 +43,7 @@ public class Player extends GameObject{
         collision();
 
         if(y > Game.HEIGHT + SIZE){
-           // Game.newGame();
+           dead = true;
         }
     }
 
@@ -48,7 +51,13 @@ public class Player extends GameObject{
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.red);
+        Color color = Color.RED;
+        if (velY <  0)
+            color = new Color(Game.clamp(150 + velY*2, 0, 255), 0 , 0);
+        if (velY > 0)
+            color = new Color(Game.clamp(150 - velY*2, 0, 255), 0 , 0);
+
+        g.setColor(color);
         g.fillRect(x, y, SIZE, SIZE);
     }
 
@@ -63,9 +72,10 @@ public class Player extends GameObject{
     public void collision(){
         for (GameObject object : handler.getGameObjects()){
             if (object.getId() == ID.Enemy){
-                if (getBounce().intersects(object.getBounce())){
-                    System.out.println("dead");
-                }
+                if (getBounce().intersects(object.getBounce(Game.TOP_WALL)))
+                   dead = true;
+                if (getBounce().intersects(object.getBounce(Game.BOTTOM_WALL)))
+                    dead = true;
             }
         }
     }
